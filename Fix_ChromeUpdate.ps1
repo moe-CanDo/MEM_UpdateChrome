@@ -301,7 +301,7 @@ function Get-WingetLatestChromeVersion {
 
 function Get-GoogleAPILatestChromeVersion {
     # Get the latest Google Chrome version from Google API. 
-    # $latestChromeVersion = Get-LatestChromeVersion
+    # $latestChromeVersion = Get-GoogleAPILatestChromeVersion 
 
     # Set the URL for the Google API
     $url = "https://versionhistory.googleapis.com/v1/chrome/platforms/win/channels/stable/versions/all/releases?filter=endtime=none&order_by=version%20desc"
@@ -474,7 +474,7 @@ if (($null -ne $chrome) -and ($result -ne 1)) {
                 Write-Host "No Chrome version found using Winget."
                 Write-Host "Trying to find latest Google Chrome version using Google API URL"
                 # In case Winget does not return a Chrome targe version.
-                $targetVersion = Get-LatestChromeVersion
+                $targetVersion = Get-GoogleAPILatestChromeVersion 
             }
         
             if ($null -eq $targetVersion) {
@@ -498,7 +498,7 @@ if (($null -ne $chrome) -and ($result -ne 1)) {
     }
     else {
         Write-Host "Trying to find latest Google Chrome version using Google API"
-        $targetVersion = Get-LatestChromeVersion   
+        $targetVersion = Get-GoogleAPILatestChromeVersion    
         
         # If we don't find the latest Google Chrome version just say its 999.0.0.0
         if ($null -eq $targetVersion) {
