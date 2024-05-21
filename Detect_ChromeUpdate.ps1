@@ -219,12 +219,12 @@ function Get-WingetLatestChromeVersion {
     return $chromeVersion
 }
 
-function Get-OmahaLatestChromeVersion {
-    # Get the latest Google Chrome version from OmahaProxy API. In case Winget does not exist.
-    # $latestChromeVersion = Get-LatestChromeVersion
+function Get-GoogleAPILatestChromeVersion {
+    # Get the latest Google Chrome version from Google API. 
+    # $latestChromeVersion = Get-GoogleAPILatestChromeVersion 
 
-    # Set the URL for the OmahaProxy API
-    $url = "https://omahaproxy.appspot.com/all.json"
+    # Set the URL for the Google API
+    $url = "https://versionhistory.googleapis.com/v1/chrome/platforms/win/channels/stable/versions/all/releases?filter=endtime=none&order_by=version%20desc"
 
     # Try fetching the latest version from the API
     try {
@@ -234,15 +234,11 @@ function Get-OmahaLatestChromeVersion {
         $json = ConvertFrom-Json -InputObject $response.Content
 
         # Find the latest stable version for Windows
-        $latestVersionInfo = $json |
-            Where-Object { $_.os -eq 'win' } |
-            ForEach-Object { $_.versions } |
-            Where-Object { $_.channel -eq 'stable' } |
-            Select-Object -First 1
+        $latestVersionInfo = $json.releases | Select-Object -First 1
 
         # If a version is found, display it and return the value
         if ($latestVersionInfo) {
-            $chromeVersion = $latestVersionInfo.version -split ' ' | Select-Object -First 1
+            $chromeVersion = $latestVersionInfo.version
             return $chromeVersion
         } else {
             # If no version is found, display an error message and return $null
@@ -256,7 +252,6 @@ function Get-OmahaLatestChromeVersion {
         return $null
     }
 }
-
 
 #enregion Functions
 
@@ -306,12 +301,12 @@ if (($null -ne $chrome) -and ($result -le 0)) {
         Write-Host "Latest Google Chrome version from Winget repository: $targetVersion"
     } else {
         Write-Host "No Chrome version found using Winget."
-        Write-Host "Trying to find latest Google Chrome version using Omaha URL"
-        $targetVersion = Get-OmahaLatestChromeVersion
+        Write-Host "Trying to find latest Google Chrome version using Google API URL"
+        $targetVersion = Get-GoogleAPILatestChromeVersion 
     }
 
     if ($null -eq $targetVersion) {
-        Write-Host "Unable to fetch information on latest version of Google Chrome from Winget nor Omaha"
+        Write-Host "Unable to fetch information on latest version of Google Chrome from Winget nor Google API"
         $detectSummary += "Chrome latest version unknown. "
         # Unable to get latest version does not allow to identify if an update is needed. 
         # Setting $result 0 to reduce number of errors and/or issues on Proactive Remediation.
